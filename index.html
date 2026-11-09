@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=2">
+  <link rel="stylesheet" href="./styles.css?v=3">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +55,7 @@
             <a href="#pilot" class="button button-primary">Get a free check</a>
             <a href="#demo" class="button">See a traced report</a>
           </div>
-          <p class="hero-note">Free for early users. Works with Ansys Mechanical and MAPDL.</p>
+          <p class="hero-note">Free for early users. Works with Ansys Mechanical and MAPDL; Nastran, Abaqus and CalculiX in early support.</p>
         </div>
 
         <figure class="scope" aria-labelledby="scope-title">
@@ -201,7 +201,7 @@
             <h3>Check the physics after the solver exits</h3>
             <p>Answers the question that matters: <em>did the solver solve the right problem?</em></p>
             <ul class="audit-list">
-              <li><strong>Force and energy balance:</strong> Checks that applied loads match solver reactions within 1&nbsp;% (thermal loads and structural force loads today; pressure, gravity and rotation coming soon).</li>
+              <li><strong>Force and energy balance:</strong> Checks that applied loads match solver reactions: within 1&nbsp;% for thermal models and 0.1&nbsp;% for structural force loads (pressure, gravity and rotation coming soon).</li>
               <li><strong>Moment balance:</strong> Checks net moment equilibrium (&Sigma; M = 0) about the global origin.</li>
               <li><strong>Work and strain energy:</strong> Checks that external work matches elastic strain energy (&frac12; W &asymp; U).</li>
               <li><strong>Result set completeness:</strong> Confirms every declared load step and substep was solved, converged and stored.</li>
@@ -256,7 +256,7 @@
               <code>simproof verify</code> re-reads a finished report and compares every tagged value with its
               evidence. Edited numbers and numbers without a tag are flagged.
             </p>
-            <code class="step-artifact">tagged_values: 10, mismatches: 0</code>
+            <code class="step-artifact">tagged_values: 16, mismatches: 0</code>
           </li>
         </ol>
       </div>
@@ -269,8 +269,9 @@
           <h2>Click a tag to see where its number came from</h2>
           <p>
             This is the checks table that <code>simproof report</code> wrote for the synthetic test model in the
-            SimProof repository, with its values unedited. Each tag opens its row of the evidence appendix
-            and the line of the input deck it was read from.
+            SimProof repository, with its values unedited and the 23 skipped rows folded into one. Each tag
+            opens its row of the evidence appendix and, where the value came from the input deck, the line
+            it was read from.
           </p>
         </div>
 
@@ -278,7 +279,7 @@
           <div class="pane report-pane">
             <div class="pane-head">
               <span class="pane-file">report.md</span>
-              <span class="pane-meta">pulsed_static: 2 pass, 3 warn, 1 fail, 1 skip</span>
+              <span class="pane-meta">pulsed_static: 5 pass, 3 warn, 2 fail, 23 skip</span>
             </div>
             <ol class="findings" id="findings"></ol>
           </div>
@@ -321,8 +322,12 @@
             <li><code>run_checks</code></li>
             <li><code>compare_studies</code></li>
             <li><code>mesh_convergence</code></li>
+            <li><code>gate</code></li>
             <li><code>build_report</code></li>
             <li><code>verify_report</code></li>
+            <li><code>reverify_report</code></li>
+            <li><code>sign_off_report</code></li>
+            <li><code>signoff_status</code></li>
           </ul>
         </div>
 
@@ -358,15 +363,17 @@
 
         <dl class="spec-sheet">
           <dt>Solvers</dt>
-          <dd>Ansys Mechanical and MAPDL: input deck, solver output, .rth and .rst result files. Nastran, Abaqus and CalculiX input decks: early support.</dd>
+          <dd>Ansys Mechanical and MAPDL: input deck, solver output, .rth and .rst result files. Early support, not yet validated on real solver output: Nastran (bulk data deck and .f06 output), CalculiX (.inp deck, .frd results and .dat reaction totals) and Abaqus (.inp deck and run messages).</dd>
           <dt>Analyses</dt>
           <dd>Static structural, steady-state and transient thermal, modal</dd>
           <dt>Reports</dt>
-          <dd>Markdown, Word and PDF, with an evidence tag on every number and an appendix listing each tag's source</dd>
+          <dd>Markdown, Word and PDF, with an evidence tag on every number, an appendix listing each tag's source, and a credibility record that sorts the check results by ASME V&amp;V&nbsp;40 credibility factor</dd>
           <dt>Re-checking</dt>
           <dd><code>simproof verify</code> compares a finished report with its evidence; <code>simproof reverify</code> reads the solver files again</dd>
+          <dt>Sign-off</dt>
+          <dd><code>simproof signoff</code> records who reviewed a report and their decision: approved, changes requested or rejected</dd>
           <dt>Interfaces</dt>
-          <dd>Command line, and an MCP server for Claude Code, Claude Desktop and other MCP clients. Public install coming later; during the free check we run SimProof for you.</dd>
+          <dd>Command line, and an MCP server for Claude Code, Claude Desktop and other MCP clients. You can add your own checks in Python. Public install coming later; during the free check we run SimProof for you.</dd>
           <dt>Where it runs</dt>
           <dd>Offline. Nothing is sent anywhere.</dd>
         </dl>
@@ -412,6 +419,7 @@
             <h3>Mesh and results</h3>
             <ul>
               <li>Mesh convergence (Grid Convergence Index) <span class="state">Validated</span></li>
+              <li>Result files present and read</li>
               <li>Results finite and consistent <span class="state">Validated</span></li>
               <li>Temperature, stress and displacement physically possible <span class="state">Validated</span></li>
               <li>Results against your expected values and limits <span class="state">Validated</span></li>
@@ -550,6 +558,6 @@
     </div>
   </footer>
 
-  <script src="./app.js?v=2"></script>
+  <script src="./app.js?v=3"></script>
 </body>
 </html>

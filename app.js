@@ -4,6 +4,8 @@
 
 const DECK_SHA = "84e4538f82591955";
 const DECK_FILE = "tests/fixtures/pulsed_static/ds.dat";
+const OUT_SHA = "004559a8d280e1d3";
+const OUT_FILE = "tests/fixtures/pulsed_static/solve.out";
 
 // Rows of the report's evidence appendix. `quoted` is the text the report prints next to the tag.
 const EVIDENCE = {
@@ -16,17 +18,27 @@ const EVIDENCE = {
   E7: { name: "Heat Flow 2 applied at solve time", value: "0.0", unit: "mW/mm^2", quoted: "0.000", location: "table _loadvari12, line 63; evaluated at t=0.012", line: 63, atSolve: true },
   E8: { name: "Heat Flow 2 time-average", value: "33.333333333333336", unit: "mW/mm^2", quoted: "33.33", location: "table _loadvari12, line 63; averaged over t=0..0.012", line: 63 },
   E9: { name: "Heat Flow 2 peak", value: "80.0", unit: "mW/mm^2", quoted: "80.00", location: "table _loadvari12, line 63; extreme over t=0..0.012", line: 63 },
+  E10: { name: "declared result request", value: "1.0", unit: "requests", quoted: "1.000", location: "SOLVE at line 116", line: 116 },
+  E11: { name: "available result sets", value: "0.0", unit: "sets", quoted: "0.000", location: "run output present; no sibling file.rth or file.rst", file: OUT_FILE, sha: OUT_SHA },
+  E12: { name: "requested endpoint time", value: "0.012", unit: "solver_time", quoted: "0.01200", location: "TIME active at SOLVE, line 116", line: 116, atSolve: true },
+  E13: { name: "missing declared requests", value: "1.0", unit: "requests", quoted: "1.000", location: "run output present; no sibling file.rth or file.rst", file: OUT_FILE, sha: OUT_SHA },
+  E14: { name: "missing requested substeps", value: "0.0", unit: "sets", quoted: "0.000", location: "run output present; no sibling file.rth or file.rst", file: OUT_FILE, sha: OUT_SHA },
+  E15: { name: "unreadable declared requests", value: "0.0", unit: "requests", quoted: "0.000", location: "run output present; no sibling file.rth or file.rst", file: OUT_FILE, sha: OUT_SHA },
 };
 
-// The checks table of the generated report, in report order.
+// The checks table of the generated report, in report order. The 23 skipped rows are summarised in the last entry.
 const FINDINGS = [
-  { status: "warn", title: "Solver errors and warnings", message: "2 solver warning(s) to review in tests/fixtures/pulsed_static/solve.out." },
+  { status: "warn", title: "Solver errors and warnings", message: "2 solver warning(s) to review: extracted warning count (0) differs from summary count (2) in 'tests\\fixtures\\pulsed_static\\solve.out'." },
   { status: "pass", title: "Unit system known", message: "MPA units; temperatures in °C." },
+  { status: "pass", title: "Thermal reference boundary present", message: "Parsed 2 thermal boundary condition(s): convection, temperature." },
+  { status: "pass", title: "Defined loads are non-zero", message: "4 applicable parsed load(s) are non-zero." },
   { status: "pass", title: "Time-varying loads in a static solve", message: "'Temperature Constraint' at t=0.012 matches its time-average within tolerance.", evidence: ["E1", "E2", "E3"] },
   { status: "warn", title: "Time-varying loads in a static solve", message: "'Heat Flow' is applied at its t=0.012 value, which differs from its time-average by more than 5% of peak. Confirm which one is intended.", evidence: ["E4", "E5", "E6"] },
   { status: "fail", title: "Time-varying loads in a static solve", message: "'Heat Flow 2' is OFF at the solve time t=0.012: the static solve applies zero although the load is non-zero at other times. If an averaged load is intended, apply the time-average instead.", evidence: ["E7", "E8", "E9"] },
+  { status: "pass", title: "Solver reports converged load steps", message: "No explicit non-convergence diagnostic was found in the read solver output." },
   { status: "warn", title: "Result fields read", message: "No result fields available (No result file (file.rth / file.rst); result fields not read.)." },
-  { status: "skip", title: "Global conservation (energy / force balance)", message: "No balance available: the reader did not supply applied totals and reactions" },
+  { status: "fail", title: "Requested result sets are present and readable", message: "Declared result sets are missing from the observed inventory.", evidence: ["E10", "E11", "E12", "E13", "E14", "E15"] },
+  { status: "skip", title: "23 more checks skipped", message: "Each states why: structural, modal and transient checks do not apply to a steady-state thermal model, and the result checks have no result file to read." },
 ];
 
 // Lines of ds.dat shown in the deck viewer. null marks skipped lines.
@@ -67,6 +79,7 @@ const DECK_LINES = [
   [97, "antype,0                   ! static analysis"],
   null,
   [115, "time,1.2e-002"],
+  [116, "solve"],
 ];
 const SOLVE_TIME_LINE = 115;
 
@@ -226,9 +239,9 @@ function showEvidence(id, { scrollDeck = true } = {}) {
     <dt>Quantity</dt><dd>${escapeHtml(ev.name)}</dd>
     <dt>Value</dt><dd class="mono">${escapeHtml(ev.value)}</dd>
     <dt>Unit</dt><dd class="mono">${escapeHtml(ev.unit)}</dd>
-    <dt>Source file</dt><dd class="mono">${DECK_FILE}</dd>
+    <dt>Source file</dt><dd class="mono">${ev.file || DECK_FILE}</dd>
     <dt>Location</dt><dd class="mono">${escapeHtml(ev.location)}</dd>
-    <dt>SHA-256</dt><dd class="mono">${DECK_SHA}</dd>`;
+    <dt>SHA-256</dt><dd class="mono">${ev.sha || DECK_SHA}</dd>`;
 
   document.getElementById("ev-verify").innerHTML =
     `The report quotes <strong>${escapeHtml(ev.quoted)}</strong>. Rounded to the same precision, the evidence value ` +
@@ -262,8 +275,11 @@ const TERMINAL = {
     cmd("simproof check tests/fixtures/pulsed_static"),
     "",
     "== pulsed_static: Pulsed heat test--Steady-State Thermal (A5) (thermal, static)",
-    `  ${st("warn", "[WARN]")} solver_messages: 2 solver warning(s) to review in tests/fixtures/pulsed_static/solve.out.`,
+    dim("  # 23 [skip] lines and the reader notes are left out here; each skip states its reason."),
+    `  ${st("warn", "[WARN]")} solver_messages: 2 solver warning(s) to review: extracted warning count (0) differs from summary count (2) in 'tests\\fixtures\\pulsed_static\\solve.out'.`,
     `  ${st("pass", "[PASS]")} unit_system: MPA units; temperatures in °C.`,
+    `  ${st("pass", "[PASS]")} thermal_boundary_present: Parsed 2 thermal boundary condition(s): convection, temperature.`,
+    `  ${st("pass", "[PASS]")} zero_load: 4 applicable parsed load(s) are non-zero.`,
     `  ${st("pass", "[PASS]")} static_time_dependent_load: 'Temperature Constraint' at t=0.012 matches its time-average within tolerance.`,
     `         Temperature Constraint applied at solve time: 35 °C ${tg("[E1]")}`,
     `         Temperature Constraint time-average: 34.8542 °C ${tg("[E2]")}`,
@@ -276,9 +292,15 @@ const TERMINAL = {
     `         Heat Flow 2 applied at solve time: 0 mW/mm^2 ${tg("[E7]")}`,
     `         Heat Flow 2 time-average: 33.3333 mW/mm^2 ${tg("[E8]")}`,
     `         Heat Flow 2 peak: 80 mW/mm^2 ${tg("[E9]")}`,
+    `  ${st("pass", "[PASS]")} solver_convergence: No explicit non-convergence diagnostic was found in the read solver output.`,
     `  ${st("warn", "[WARN]")} results_available: No result fields available (No result file (file.rth / file.rst); result fields not read.).`,
-    `  ${dim("[skip]")} global_balance: No balance available: the reader did not supply applied totals and reactions`,
-    `  note: No result file (file.rth / file.rst); result fields not read.`,
+    `  ${st("fail", "[FAIL]")} result_set_completeness: Declared result sets are missing from the observed inventory.`,
+    `         declared result request: 1 requests ${tg("[E10]")}`,
+    `         available result sets: 0 sets ${tg("[E11]")}`,
+    `         requested endpoint time: 0.012 solver_time ${tg("[E12]")}`,
+    `         missing declared requests: 1 requests ${tg("[E13]")}`,
+    `         missing requested substeps: 0 sets ${tg("[E14]")}`,
+    `         unreadable declared requests: 0 requests ${tg("[E15]")}`,
   ],
   report: [
     cmd("simproof report tests/fixtures/pulsed_static -o report.md"),
@@ -287,11 +309,15 @@ const TERMINAL = {
     '  "path": "report.md",',
     '  "verification": {',
     `    "ok": ${st("pass", "true")},`,
-    '    "tagged_values": 10,',
+    '    "tagged_values": 16,',
     '    "mismatches": [],',
     '    "unknown_ids": [],',
-    '    "untraced_values": []',
-    "  }",
+    '    "untraced_values": [],',
+    `    "appendix_intact": ${st("pass", "true")},`,
+    '    "appendix_reason": ""',
+    "  },",
+    '  "notes": [],',
+    '  "manifest": "report.md.evidence.json"',
     "}",
     "",
     dim("# The report is verified as it is written. Every number in it carries an [E#] tag,"),
@@ -303,10 +329,12 @@ const TERMINAL = {
     "",
     "{",
     `  "ok": ${st("pass", "true")},`,
-    '  "tagged_values": 10,',
+    '  "tagged_values": 16,',
     '  "mismatches": [],',
     '  "unknown_ids": [],',
-    '  "untraced_values": []',
+    '  "untraced_values": [],',
+    `  "appendix_intact": ${st("pass", "true")},`,
+    '  "appendix_reason": ""',
     "}",
     "",
     dim("# A changed number shows up under mismatches; a number with no tag under untraced_values."),
