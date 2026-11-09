@@ -529,6 +529,96 @@ dd code,
   font-size: 0.9375rem;
 }
 
+/* Plain overview: how it works, drawn */
+.flow {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr 40px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 28px 24px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.flow-step {
+  text-align: center;
+}
+
+.flow-art {
+  display: block;
+  width: 160px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 12px;
+}
+
+.flow-step h3 {
+  margin-bottom: 6px;
+}
+
+.flow-step p {
+  max-width: 22em;
+  margin: 0 auto;
+  color: var(--graphite);
+  font-size: 0.9375rem;
+}
+
+.flow-arrow svg {
+  display: block;
+  width: 40px;
+  height: 20px;
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fa-sheet { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.fa-back { fill: var(--tint); stroke: var(--rule-strong); }
+.fa-lines { fill: none; stroke: var(--rule-strong); stroke-width: 4; stroke-linecap: round; }
+.fa-lines-fail { stroke: var(--fail-wash); }
+.fa-pass { fill: var(--pass); }
+.fa-fail { fill: var(--fail); }
+.fa-mark { fill: none; stroke: #fff; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.fa-tag { fill: var(--proof-wash); stroke: var(--proof); stroke-width: 1.5; }
+.fa-text { font-family: var(--font-code); font-size: 11px; fill: var(--proof); }
+.fa-link { fill: none; stroke: var(--proof); stroke-width: 2; stroke-dasharray: 4 3; }
+.fa-cited { fill: none; stroke: var(--proof); stroke-width: 4; stroke-linecap: round; }
+
+@media (max-width: 860px) {
+  .flow {
+    grid-template-columns: 1fr;
+  }
+
+  .flow-arrow svg {
+    margin: 0 auto;
+    transform: rotate(90deg);
+  }
+}
+
+.card-icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 12px;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.card-icon > :not(.ci-mark):not(.ci-handle) { fill: var(--tint); }
+.card-icon .ci-mark, .card-icon .ci-handle { fill: none; stroke-width: 2.5; }
+.icon-fail { stroke: var(--fail); }
+.icon-fail > :first-child { fill: var(--fail-wash); }
+.icon-proof { stroke: var(--proof); }
+.icon-proof > :first-child { fill: var(--proof-wash); }
+.icon-pass { stroke: var(--pass); }
+.icon-pass > :first-child { fill: var(--pass-wash); }
+
 /* Plain overview: key facts */
 .facts {
   display: grid;

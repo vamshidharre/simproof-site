@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=4">
+  <link rel="stylesheet" href="./styles.css?v=5">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -133,8 +133,53 @@
           <h2>SimProof in one minute</h2>
         </div>
 
+        <ol class="flow" aria-label="How SimProof works">
+          <li class="flow-step">
+            <svg class="flow-art" viewBox="0 0 160 110" aria-hidden="true">
+              <rect x="52" y="8" width="64" height="82" rx="6" class="fa-sheet fa-back"/>
+              <rect x="40" y="16" width="64" height="82" rx="6" class="fa-sheet fa-back"/>
+              <rect x="28" y="24" width="64" height="82" rx="6" class="fa-sheet"/>
+              <path d="M40 44h40M40 56h32M40 68h40M40 80h24" class="fa-lines"/>
+            </svg>
+            <h3>1. Your simulation files</h3>
+            <p>The setup, the results and the solver log, exactly as the simulation left them.</p>
+          </li>
+          <li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 40 20"><path d="M2 10h32M26 3l8 7-8 7"/></svg></li>
+          <li class="flow-step">
+            <svg class="flow-art" viewBox="0 0 160 110" aria-hidden="true">
+              <rect x="30" y="8" width="100" height="94" rx="8" class="fa-sheet"/>
+              <circle cx="52" cy="32" r="9" class="fa-pass"/><path d="M47 32l4 4 6-7" class="fa-mark"/>
+              <path d="M70 32h44" class="fa-lines"/>
+              <circle cx="52" cy="56" r="9" class="fa-pass"/><path d="M47 56l4 4 6-7" class="fa-mark"/>
+              <path d="M70 56h36" class="fa-lines"/>
+              <circle cx="52" cy="80" r="9" class="fa-fail"/><path d="M48 76l8 8M56 76l-8 8" class="fa-mark"/>
+              <path d="M70 80h40" class="fa-lines fa-lines-fail"/>
+            </svg>
+            <h3>2. 32 automatic checks</h3>
+            <p>SimProof looks for common setup and physics mistakes. Each check passes, warns or fails, and says why.</p>
+          </li>
+          <li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 40 20"><path d="M2 10h32M26 3l8 7-8 7"/></svg></li>
+          <li class="flow-step">
+            <svg class="flow-art" viewBox="0 0 160 110" aria-hidden="true">
+              <rect x="6" y="8" width="100" height="94" rx="8" class="fa-sheet"/>
+              <path d="M18 26h56M18 38h70" class="fa-lines"/>
+              <rect x="14" y="50" width="84" height="22" rx="4" class="fa-tag"/>
+              <text x="56" y="65" text-anchor="middle" class="fa-text">33.33 [E8]</text>
+              <path d="M18 86h50" class="fa-lines"/>
+              <path d="M98 61 C114 61 114 44 124 44" class="fa-link"/>
+              <rect x="124" y="22" width="30" height="44" rx="4" class="fa-sheet"/>
+              <path d="M130 34h18" class="fa-lines"/>
+              <path d="M130 44h18" class="fa-cited"/>
+              <path d="M130 54h18" class="fa-lines"/>
+            </svg>
+            <h3>3. A report with proof</h3>
+            <p>Every number in the report links back to the exact file and line it came from, and can be re-checked at any time.</p>
+          </li>
+        </ol>
+
         <div class="problem-grid">
           <div class="problem">
+            <svg class="card-icon icon-fail" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 30 28H2Z"/><path d="M16 13v7M16 24v.5" class="ci-mark"/></svg>
             <h3>The problem</h3>
             <p>
               Companies decide on designs using simulation results. Checking those results is slow, manual
@@ -143,6 +188,7 @@
             </p>
           </div>
           <div class="problem">
+            <svg class="card-icon icon-proof" viewBox="0 0 32 32" aria-hidden="true"><circle cx="13" cy="13" r="9"/><path d="M20 20l9 9" class="ci-handle"/><path d="M9 13l3 3 5-6" class="ci-mark"/></svg>
             <h3>What SimProof does</h3>
             <p>
               It reads the simulation files, runs 32 automatic checks for common setup and physics mistakes,
@@ -150,6 +196,7 @@
             </p>
           </div>
           <div class="problem">
+            <svg class="card-icon icon-pass" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 27 7v8c0 7-5 12-11 14C10 27 5 22 5 15V7Z"/><path d="M11 16l4 4 7-8" class="ci-mark"/></svg>
             <h3>Why it matters</h3>
             <p>
               A wrong number can lead to a failed part, a costly redesign or a safety risk. SimProof gives
