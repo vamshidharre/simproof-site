@@ -529,6 +529,77 @@ dd code,
   font-size: 0.9375rem;
 }
 
+/* Plain overview: key facts */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.facts > div {
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.facts dt {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+  margin-bottom: 4px;
+}
+
+.facts dd {
+  font-size: 0.9375rem;
+}
+
+.eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.section-head p.eyebrow {
+  font-size: 0.8125rem;
+}
+
+/* Full check list, folded */
+.check-details {
+  margin-top: 28px;
+}
+
+.check-details > summary {
+  display: inline-block;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 10px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.check-details[open] > summary {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 860px) {
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .facts {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Pre vs Post Solve Audit Grid */
 .audit-grid {
   display: grid;
