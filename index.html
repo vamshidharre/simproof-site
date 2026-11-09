@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=6">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -28,6 +28,7 @@
       </a>
       <nav class="primary-nav" aria-label="Main">
         <a href="#why">Overview</a>
+        <a href="#examples">Examples</a>
         <a href="#what">For engineers</a>
         <a href="#demo">Demo</a>
         <a href="#available">Checks</a>
@@ -220,6 +221,144 @@
           <div><dt>Now</dt><dd>Free checks of real studies with engineering teams, for feedback</dd></div>
           <div><dt>Team</dt><dd>Founded by a simulation engineer who has worked at Mercedes-Benz AG and Valeo</dd></div>
         </dl>
+      </div>
+    </section>
+
+    <!-- Examples: real SimProof output on synthetic test models -->
+    <section class="section" id="examples">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Examples</h2>
+          <p>
+            Four synthetic test models from the SimProof repository. Every number on these cards is what
+            SimProof printed when it checked them.
+          </p>
+        </div>
+
+        <div class="example-grid">
+
+          <article class="example">
+            <div class="example-art">
+              <span class="example-badge badge-fail">Fails</span>
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <rect x="28" y="70" width="110" height="46" rx="4" class="ex-part"/>
+                <path d="M48 40c6 8-6 14 0 22M83 40c6 8-6 14 0 22M118 40c6 8-6 14 0 22" class="ex-heat"/>
+                <path d="M170 116h130M170 116V30" class="ex-axis"/>
+                <path d="M172 116h28v-62h34v62h64" class="ex-curve"/>
+                <path d="M258 30v86" class="ex-cursor"/>
+                <circle cx="258" cy="116" r="5" class="ex-dot"/>
+                <text x="262" y="42" class="ex-label ex-label-fail">solve</text>
+              </svg>
+            </div>
+            <div class="example-body">
+              <h3>Pulsed heat loads in a steady-state solve</h3>
+              <p class="example-kicker">Ansys Mechanical, thermal</p>
+              <h4>What was checked</h4>
+              <p>A heat study whose loads switch on and off over time, solved as steady state at t&nbsp;=&nbsp;0.012&nbsp;s.</p>
+              <h4>SimProof found</h4>
+              <dl class="metrics">
+                <div><dt>0.000</dt><dd>mW/mm² applied at the solve</dd></div>
+                <div><dt>33.33</dt><dd>mW/mm² average over time</dd></div>
+                <div><dt>80.00</dt><dd>mW/mm² peak</dd></div>
+              </dl>
+              <p class="example-verdict">
+                The solve looks at the load only at the instant it is switched off, so this heat input counts
+                as zero. If an average load was intended, apply the average.
+              </p>
+            </div>
+          </article>
+
+          <article class="example">
+            <div class="example-art">
+              <span class="example-badge badge-fail">Fails</span>
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <path d="M40 24v104" class="ex-wall"/>
+                <path d="M40 34l-12 10M40 54l-12 10M40 74l-12 10M40 94l-12 10M40 114l-12 10" class="ex-hatch"/>
+                <rect x="40" y="62" width="110" height="26" rx="3" class="ex-part"/>
+                <rect x="196" y="56" width="80" height="38" rx="3" class="ex-part ex-part-fail"/>
+                <text x="236" y="80" text-anchor="middle" class="ex-label ex-label-fail">?</text>
+                <path d="M160 75h28" class="ex-gap"/>
+              </svg>
+            </div>
+            <div class="example-body">
+              <h3>A part that nothing holds</h3>
+              <p class="example-kicker">Ansys Mechanical, static structural</p>
+              <h4>What was checked</h4>
+              <p>A two-part model with one support. Only one of the parts is connected to it.</p>
+              <h4>SimProof found</h4>
+              <dl class="metrics">
+                <div><dt>2</dt><dd>parts in the mesh</dd></div>
+                <div><dt>1</dt><dd>part connected to a support</dd></div>
+                <div><dt>1</dt><dd>part with no path to a support</dd></div>
+              </dl>
+              <p class="example-verdict">
+                One part floats free, so its results are not meaningful. SimProof names a node in that part
+                (node&nbsp;11) so the engineer can find it.
+              </p>
+            </div>
+          </article>
+
+          <article class="example">
+            <div class="example-art">
+              <span class="example-badge badge-warn">Needs review</span>
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <path d="M60 75h200" class="ex-beam"/>
+                <path d="M60 75c33-30 67-30 100 0s67 30 100 0" class="ex-mode"/>
+                <path d="M60 75c33 30 67 30 100 0s67-30 100 0" class="ex-mode"/>
+                <path d="M30 118h40M58 110l12 8-12 8" class="ex-drift"/>
+                <path d="M290 32h-40M262 24l-12 8 12 8" class="ex-drift"/>
+              </svg>
+            </div>
+            <div class="example-body">
+              <h3>A vibration study where the part can drift</h3>
+              <p class="example-kicker">Ansys Mechanical, modal</p>
+              <h4>What was checked</h4>
+              <p>A natural-frequency study that solved seven modes without any error.</p>
+              <h4>SimProof found</h4>
+              <dl class="metrics">
+                <div><dt>6</dt><dd>modes below 0.001&nbsp;Hz</dd></div>
+                <div><dt>12&nbsp;Hz</dt><dd>first real vibration mode</dd></div>
+                <div><dt>1</dt><dd>support definition</dd></div>
+              </dl>
+              <p class="example-verdict">
+                Six near-zero frequencies usually mean the part can move as a whole. Confirm it is meant to
+                be free, or add the supports that were intended.
+              </p>
+            </div>
+          </article>
+
+          <article class="example">
+            <div class="example-art">
+              <span class="example-badge badge-pass">Passes</span>
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <path d="M50 24v104" class="ex-wall"/>
+                <path d="M50 34l-12 10M50 54l-12 10M50 74l-12 10M50 94l-12 10M50 114l-12 10" class="ex-hatch"/>
+                <rect x="50" y="64" width="200" height="20" rx="2" class="ex-part"/>
+                <path d="M250 24v34M242 48l8 10 8-10" class="ex-force"/>
+                <path d="M70 126v-36M62 100l8-10 8 10" class="ex-react"/>
+                <text x="262" y="36" class="ex-label">1000</text>
+                <text x="84" y="124" class="ex-label ex-label-pass">1000</text>
+              </svg>
+            </div>
+            <div class="example-body">
+              <h3>A cantilever beam that balances</h3>
+              <p class="example-kicker">CalculiX, static structural</p>
+              <h4>What was checked</h4>
+              <p>A beam fixed at one end with a downward load at the tip, and its result files.</p>
+              <h4>SimProof found</h4>
+              <dl class="metrics">
+                <div><dt>1000</dt><dd>force applied, down</dd></div>
+                <div><dt>1000</dt><dd>force taken by the support</dd></div>
+                <div><dt>0.000&nbsp;%</dt><dd>imbalance</dd></div>
+              </dl>
+              <p class="example-verdict">
+                Every force put into the model comes out at the support, and the setup, results and material
+                checks pass. The input file states no units, so SimProof quotes the forces without one.
+              </p>
+            </div>
+          </article>
+
+        </div>
       </div>
     </section>
 

@@ -1515,3 +1515,145 @@ dd code,
     transition: none !important;
   }
 }
+
+/* ---------- Examples: cards with a picture, a verdict badge and key numbers ---------- */
+
+.example-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.example {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+}
+
+.example-art {
+  position: relative;
+  padding: 18px 18px 10px;
+  background: var(--tint);
+  border-bottom: 1px solid var(--rule);
+}
+
+.example-art svg {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.example-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.badge-fail { background: var(--fail); }
+.badge-warn { background: var(--warn); }
+.badge-pass { background: var(--pass); }
+
+.example-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px 22px 22px;
+}
+
+.example-body h3 {
+  font-size: 1.125rem;
+}
+
+.example-kicker {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.example-body h4 {
+  margin: 16px 0 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.example-body > p:not(.example-kicker):not(.example-verdict) {
+  color: var(--graphite);
+  font-size: 0.9375rem;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metrics > div {
+  padding: 10px 12px;
+  background: var(--tint);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+.metrics dt {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.metrics dd {
+  color: var(--graphite);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.example-verdict {
+  margin-top: 16px;
+  padding-left: 12px;
+  border-left: 3px solid var(--rule-strong);
+  color: var(--graphite);
+  font-size: 0.9375rem;
+}
+
+/* Example drawings */
+.ex-part { fill: #fff; stroke: var(--ink); stroke-width: 2; }
+.ex-part-fail { stroke: var(--fail); stroke-dasharray: 6 4; fill: var(--fail-wash); }
+.ex-heat { fill: none; stroke: var(--warn); stroke-width: 2.5; stroke-linecap: round; }
+.ex-axis { fill: none; stroke: var(--rule-strong); stroke-width: 1.5; }
+.ex-curve { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+.ex-cursor { stroke: var(--fail); stroke-width: 1.5; }
+.ex-dot { fill: var(--fail); stroke: #fff; stroke-width: 2; }
+.ex-wall { stroke: var(--ink); stroke-width: 3; }
+.ex-hatch { stroke: var(--muted); stroke-width: 1.5; }
+.ex-gap { stroke: var(--fail); stroke-width: 1.5; stroke-dasharray: 3 4; }
+.ex-beam { stroke: var(--rule-strong); stroke-width: 2; stroke-dasharray: 4 4; }
+.ex-mode { fill: none; stroke: var(--proof); stroke-width: 2.5; }
+.ex-drift { fill: none; stroke: var(--warn); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.ex-force { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.ex-react { fill: none; stroke: var(--pass); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.ex-label { fill: var(--graphite); font: 600 13px var(--font-body); }
+.ex-label-fail { fill: var(--fail); }
+.ex-label-pass { fill: var(--pass); }
+
+@media (max-width: 860px) {
+  .example-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+}
