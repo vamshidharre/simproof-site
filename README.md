@@ -6,7 +6,7 @@ Python package (`src/`, `tests/`).
 ## Files
 
 - `index.html`: the page. Sections: hero, the problem, how it works, the traced-report demo,
-  MCP and command line, the checks that work today, the free check for early users, founder,
+  MCP and command line, the checks that work today, the free check for early users, about,
   contact.
 - `styles.css`: design tokens on `:root`. Light only and flat: hairline borders, no shadows.
   Type is IBM Plex Sans with IBM Plex Mono for code, loaded from Google Fonts.
