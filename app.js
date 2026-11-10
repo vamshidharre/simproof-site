@@ -353,10 +353,292 @@ const TERMINAL = {
   ],
 };
 
+// ---------- llm-ui: Streaming AI Agent Simulation Auditor ----------
+
+const LLM_SCENARIOS = {
+  pulsed: {
+    id: "pulsed",
+    title: "Pulsed thermal load",
+    prompt: "Open tests/fixtures/pulsed_static and verify whether the steady-state thermal solve can be trusted.",
+    tools: [
+      {
+        name: "open_study",
+        args: 'path="tests/fixtures/pulsed_static"',
+        result: "Loaded ds.dat (Ansys MAPDL Steady-State Thermal, 28,420 nodes)",
+        status: "pass"
+      },
+      {
+        name: "run_checks",
+        args: 'checks=["unit_system", "static_time_dependent_load", "force_balance"]',
+        result: "32 checks evaluated: 5 PASS, 3 WARN, 2 FAIL",
+        status: "fail"
+      }
+    ],
+    paragraphsBefore: [
+      "The steady-state thermal solve <strong>cannot be trusted</strong> for heat dissipation sizing."
+    ],
+    finding: {
+      status: "fail",
+      title: "static_time_dependent_load: 'Heat Flow 2' is OFF at solve time t=0.012 s",
+      items: [
+        'Applied at solve instant: <strong class="mono">0.000 mW/mm²</strong> <button class="tag" data-ev="E7" data-jump>[E7]</button>',
+        'Step time-average: <strong class="mono">33.33 mW/mm²</strong> <button class="tag" data-ev="E8" data-jump>[E8]</button>',
+        'Peak load in table: <strong class="mono">80.00 mW/mm²</strong> <button class="tag" data-ev="E9" data-jump>[E9]</button>'
+      ]
+    },
+    paragraphsAfter: [
+      "The steady solve evaluated this load only at <code>t = 0.012 s</code>, where it is zero. Over the load step, the part absorbed a time-average of 33.33 mW/mm² [E8]. Applying zero under-predicts peak operating temperatures.",
+      "<strong>Recommendation:</strong> Apply the time-average flux (33.33 mW/mm² [E8]) in <code>ds.dat</code> line 63, or switch to a transient thermal solve in MAPDL."
+    ]
+  },
+  balance: {
+    id: "balance",
+    title: "Cantilever balance",
+    prompt: "Check tests/fixtures/cantilever_beam.inp for static force equilibrium and reaction balance.",
+    tools: [
+      {
+        name: "open_study",
+        args: 'path="tests/fixtures/cantilever_beam"',
+        result: "Loaded beam.inp (CalculiX static structural, 1,240 elements)",
+        status: "pass"
+      },
+      {
+        name: "run_checks",
+        args: 'checks=["force_balance", "moment_balance", "strain_energy"]',
+        result: "Global equilibrium checks: 3 PASS, 0 FAIL",
+        status: "pass"
+      }
+    ],
+    paragraphsBefore: [
+      "The static structural solve <strong>satisfies global force and energy balance</strong>."
+    ],
+    finding: {
+      status: "pass",
+      title: "force_balance & strain_energy: Global equilibrium verified",
+      items: [
+        'Applied tip load: <strong class="mono">1000.0 N</strong> (downward force)',
+        'Support reaction force: <strong class="mono">1000.0 N</strong> (upward reaction)',
+        'Net force residual: <strong class="mono">0.000 %</strong> (tolerance: 0.1 %)'
+      ]
+    },
+    paragraphsAfter: [
+      "External work <code>1/2 W</code> matches internal elastic strain energy <code>U</code> within 0.04%. Material values (E = 210 GPa, ν = 0.3) and boundary conditions pass all setup checks.",
+      "<strong>Sign-off status:</strong> Model passes deterministic balance criteria and is eligible for report sign-off."
+    ]
+  },
+  modal: {
+    id: "modal",
+    title: "Unconstrained modal BC",
+    prompt: "Audit tests/fixtures/bracket_modal.bdf before submitting the HPC cluster job.",
+    tools: [
+      {
+        name: "open_study",
+        args: 'path="tests/fixtures/bracket_modal"',
+        result: "Loaded bracket.bdf (Nastran SOL 103 Modal, 64,110 DOFs)",
+        status: "pass"
+      },
+      {
+        name: "run_checks",
+        args: 'checks=["displacement_constraints", "density_check"]',
+        result: "Pre-solve audit: 1 FAIL, 1 PASS",
+        status: "fail"
+      }
+    ],
+    paragraphsBefore: [
+      "The model has a <strong>critical pre-solve setup mistake</strong> that will waste cluster compute:"
+    ],
+    finding: {
+      status: "fail",
+      title: "displacement_constraints: Zero SPC constraints detected",
+      items: [
+        'Rigid-body modes: <strong class="mono">6 unconstrained DOFs (0.00 Hz)</strong>',
+        'Mass matrix: <strong class="mono">Consistent mass generated from RHO</strong>',
+        'Boundary supports: <strong class="mono">0 fixed nodes in SPC / SPC1 cards</strong>'
+      ]
+    },
+    paragraphsAfter: [
+      "Because the bracket has no fixed boundary condition, the Lanczos eigensolver will extract 6 rigid-body modes instead of the flexible structural modes.",
+      "<strong>Action required:</strong> Constrain the bolt holes with SPC1 cards before submitting to the cluster queue."
+    ]
+  }
+};
+
+let currentScenarioId = "pulsed";
+let activeStreamTimer = null;
+
+function runLlmStream(scenarioId) {
+  if (activeStreamTimer) {
+    clearTimeout(activeStreamTimer);
+    activeStreamTimer = null;
+  }
+
+  currentScenarioId = scenarioId;
+  const scenario = LLM_SCENARIOS[scenarioId] || LLM_SCENARIOS.pulsed;
+  const container = document.getElementById("llm-chat-stream");
+  if (!container) return;
+
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Render static initial structure: User message
+  container.innerHTML = `
+    <div class="llm-msg-user">
+      <span class="llm-user-badge">User</span>
+      <span class="llm-user-prompt">&gt; ${escapeHtml(scenario.prompt)}</span>
+    </div>
+    <div class="llm-msg-assistant" id="llm-assistant-msg"></div>
+  `;
+
+  const assistantMsg = document.getElementById("llm-assistant-msg");
+
+  if (reducedMotion) {
+    // Instant rendering without animation
+    let toolsHtml = scenario.tools.map(t => `
+      <div class="llm-tool-card">
+        <div class="llm-tool-head">
+          <span class="llm-tool-icon">⚙</span>
+          <span>simproof:<span class="tool-name">${escapeHtml(t.name)}</span>(${escapeHtml(t.args)})</span>
+        </div>
+        <div class="llm-tool-result ${t.status === "fail" ? "has-fail" : ""}">✓ ${escapeHtml(t.result)}</div>
+      </div>
+    `).join("");
+
+    let findingHtml = `
+      <div class="llm-finding-card ${scenario.finding.status}">
+        <div class="llm-finding-header">
+          <span class="chip chip-${scenario.finding.status}">${scenario.finding.status.toUpperCase()}</span>
+          <span>${escapeHtml(scenario.finding.title)}</span>
+        </div>
+        <ul class="llm-finding-list">
+          ${scenario.finding.items.map(it => `<li>• ${it}</li>`).join("")}
+        </ul>
+      </div>
+    `;
+
+    assistantMsg.innerHTML = `
+      ${toolsHtml}
+      <div class="llm-response-content">
+        ${scenario.paragraphsBefore.map(p => `<p>${p}</p>`).join("")}
+        ${findingHtml}
+        ${scenario.paragraphsAfter.map(p => `<p>${p}</p>`).join("")}
+      </div>
+    `;
+    container.scrollTop = container.scrollHeight;
+    return;
+  }
+
+  // Animated llm-ui token stream
+  let toolIndex = 0;
+
+  function renderNextTool() {
+    if (toolIndex < scenario.tools.length) {
+      const tool = scenario.tools[toolIndex];
+      const toolCard = document.createElement("div");
+      toolCard.className = "llm-tool-card";
+      toolCard.innerHTML = `
+        <div class="llm-tool-head">
+          <span class="llm-tool-icon">⚙</span>
+          <span>simproof:<span class="tool-name">${escapeHtml(tool.name)}</span>(${escapeHtml(tool.args)})</span>
+        </div>
+        <div class="llm-tool-result running" id="tool-res-${toolIndex}">...executing check</div>
+      `;
+      assistantMsg.appendChild(toolCard);
+      container.scrollTop = container.scrollHeight;
+
+      activeStreamTimer = setTimeout(() => {
+        const resEl = document.getElementById(`tool-res-${toolIndex}`);
+        if (resEl) {
+          resEl.className = `llm-tool-result ${tool.status === "fail" ? "has-fail" : ""}`;
+          resEl.innerHTML = `✓ ${escapeHtml(tool.result)}`;
+        }
+        toolIndex++;
+        activeStreamTimer = setTimeout(renderNextTool, 180);
+      }, 320);
+    } else {
+      // Tools completed: start streaming markdown and custom components
+      startTextStreaming();
+    }
+  }
+
+  function startTextStreaming() {
+    const contentBox = document.createElement("div");
+    contentBox.className = "llm-response-content";
+    assistantMsg.appendChild(contentBox);
+
+    // Prepare steps
+    const steps = [];
+    scenario.paragraphsBefore.forEach(p => steps.push({ type: "text", html: p }));
+    steps.push({ type: "component", finding: scenario.finding });
+    scenario.paragraphsAfter.forEach(p => steps.push({ type: "text", html: p }));
+
+    let stepIndex = 0;
+
+    function renderNextStep() {
+      if (stepIndex >= steps.length) {
+        // Stream completed
+        const cursor = contentBox.querySelector(".llm-cursor");
+        if (cursor) cursor.remove();
+        return;
+      }
+
+      const currentStep = steps[stepIndex];
+      if (currentStep.type === "component") {
+        const finding = currentStep.finding;
+        const findingCard = document.createElement("div");
+        findingCard.className = `llm-finding-card ${finding.status}`;
+        findingCard.innerHTML = `
+          <div class="llm-finding-header">
+            <span class="chip chip-${finding.status}">${finding.status.toUpperCase()}</span>
+            <span>${escapeHtml(finding.title)}</span>
+          </div>
+          <ul class="llm-finding-list">
+            ${finding.items.map(it => `<li>• ${it}</li>`).join("")}
+          </ul>
+        `;
+        contentBox.appendChild(findingCard);
+        container.scrollTop = container.scrollHeight;
+        stepIndex++;
+        activeStreamTimer = setTimeout(renderNextStep, 200);
+      } else {
+        // Text paragraph: stream words
+        const p = document.createElement("p");
+        contentBox.appendChild(p);
+
+        // Split HTML tokens smoothly
+        const tokens = currentStep.html.split(" ");
+        let tokenIndex = 0;
+
+        function streamToken() {
+          if (tokenIndex < tokens.length) {
+            tokenIndex++;
+            p.innerHTML = tokens.slice(0, tokenIndex).join(" ") + '<span class="llm-cursor" aria-hidden="true"></span>';
+            container.scrollTop = container.scrollHeight;
+            const delay = tokens[tokenIndex - 1]?.endsWith(".") ? 45 : 18;
+            activeStreamTimer = setTimeout(streamToken, delay);
+          } else {
+            p.innerHTML = currentStep.html; // Clean final tokens
+            stepIndex++;
+            activeStreamTimer = setTimeout(renderNextStep, 100);
+          }
+        }
+        streamToken();
+      }
+    }
+
+    renderNextStep();
+  }
+
+  renderNextTool();
+}
+
 function initTerminal() {
   const body = document.getElementById("terminal-body");
+  const llmContainer = document.getElementById("llm-ui-container");
+  const actions = document.getElementById("terminal-actions");
   const tabs = Array.from(document.querySelectorAll(".terminal-tabs [role=tab]"));
-  if (!body || !tabs.length) return;
+  const replayBtn = document.getElementById("stream-replay-btn");
+  const presetPills = Array.from(document.querySelectorAll(".preset-pill"));
+
+  if (!tabs.length) return;
 
   function select(tab, focus) {
     tabs.forEach((t) => {
@@ -364,9 +646,27 @@ function initTerminal() {
       t.setAttribute("aria-selected", String(on));
       t.tabIndex = on ? 0 : -1;
     });
-    body.setAttribute("aria-labelledby", tab.id);
-    body.innerHTML = TERMINAL[tab.dataset.term].join("\n");
-    body.scrollTop = 0;
+
+    const term = tab.dataset.term;
+    if (term === "mcp") {
+      if (body) body.hidden = true;
+      if (llmContainer) llmContainer.hidden = false;
+      if (actions) actions.hidden = false;
+      // Start llm-ui stream if empty
+      const stream = document.getElementById("llm-chat-stream");
+      if (stream && !stream.hasChildNodes()) {
+        runLlmStream(currentScenarioId);
+      }
+    } else {
+      if (llmContainer) llmContainer.hidden = true;
+      if (actions) actions.hidden = true;
+      if (body) {
+        body.hidden = false;
+        body.setAttribute("aria-labelledby", tab.id);
+        body.innerHTML = TERMINAL[term].join("\n");
+        body.scrollTop = 0;
+      }
+    }
     if (focus) tab.focus();
   }
 
@@ -380,6 +680,24 @@ function initTerminal() {
     });
   });
 
+  // Preset prompt switcher
+  presetPills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      presetPills.forEach(p => p.classList.remove("is-active"));
+      pill.classList.add("is-active");
+      const scenario = pill.dataset.scenario;
+      runLlmStream(scenario);
+    });
+  });
+
+  // Replay stream button
+  if (replayBtn) {
+    replayBtn.addEventListener("click", () => {
+      runLlmStream(currentScenarioId);
+    });
+  }
+
+  // Initial tab selection (Claude Code Live Agent)
   select(tabs[0], false);
 }
 
@@ -435,7 +753,7 @@ function initContactForm() {
     ].join("\n");
 
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    status.textContent = `Your email app should now be open with the request filled in. If nothing opened, write to ${CONTACT_EMAIL}.`;
+    status.textContent = `Your email app should now be open with the request filled in. If nothing opened, reach out to us on LinkedIn.`;
   });
 }
 

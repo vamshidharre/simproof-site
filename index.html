@@ -525,16 +525,33 @@
         <div class="terminal">
           <div class="terminal-head">
             <div class="terminal-tabs" role="tablist" aria-label="Example sessions">
-              <button role="tab" id="tab-check" aria-controls="terminal-body" aria-selected="true" data-term="check">check</button>
-              <button role="tab" id="tab-report" aria-controls="terminal-body" aria-selected="false" tabindex="-1" data-term="report">report</button>
-              <button role="tab" id="tab-verify" aria-controls="terminal-body" aria-selected="false" tabindex="-1" data-term="verify">verify</button>
-              <button role="tab" id="tab-mcp" aria-controls="terminal-body" aria-selected="false" tabindex="-1" data-term="mcp">Claude Code</button>
+              <button role="tab" id="tab-mcp" aria-controls="llm-ui-container" aria-selected="true" data-term="mcp"><span class="tab-dot" aria-hidden="true"></span>Claude Code (Live Agent)</button>
+              <button role="tab" id="tab-check" aria-controls="terminal-body" aria-selected="false" tabindex="-1" data-term="check">simproof check</button>
+              <button role="tab" id="tab-report" aria-controls="terminal-body" aria-selected="false" tabindex="-1" data-term="report">simproof report</button>
+              <button role="tab" id="tab-verify" aria-controls="terminal-body" aria-selected="false" tabindex="-1" data-term="verify">simproof verify</button>
+            </div>
+            <div class="terminal-actions" id="terminal-actions">
+              <button id="stream-replay-btn" class="stream-btn" aria-label="Replay stream">Replay ⟳</button>
             </div>
           </div>
-          <pre class="terminal-body" id="terminal-body" role="tabpanel" aria-labelledby="tab-check" tabindex="0"></pre>
+
+          <!-- llm-ui streaming chat container -->
+          <div class="llm-ui-container" id="llm-ui-container" role="tabpanel" aria-labelledby="tab-mcp">
+            <div class="llm-presets-bar">
+              <span class="llm-presets-label">Prompt:</span>
+              <button class="preset-pill is-active" data-scenario="pulsed">Pulsed thermal load</button>
+              <button class="preset-pill" data-scenario="balance">Cantilever balance</button>
+              <button class="preset-pill" data-scenario="modal">Unconstrained modal BC</button>
+            </div>
+            <div class="llm-chat-stream" id="llm-chat-stream" aria-live="polite"></div>
+          </div>
+
+          <!-- Classic CLI terminal for check, report, verify -->
+          <pre class="terminal-body" id="terminal-body" role="tabpanel" aria-labelledby="tab-check" tabindex="0" hidden></pre>
+
           <div class="terminal-foot">
             <code>claude mcp add simproof -- simproof-mcp</code>
-            <span class="state soon">Coming later</span>
+            <span class="state soon">MCP Server Ready</span>
           </div>
         </div>
       </div>
@@ -687,7 +704,7 @@
             Ask for a free check of one of your studies, or tell us what you would need SimProof to do.
           </p>
           <p>Sending opens your email app with the request filled in; nothing is stored on this site.</p>
-          <p class="contact-direct">Or reach out directly on <a href="https://www.linkedin.com/company/simproof/" target="_blank" rel="noopener">LinkedIn</a>, or write to <a href="mailto:vamshidharreddye@gmail.com">vamshidharreddye@gmail.com</a>.</p>
+          <p class="contact-direct">Or reach out directly on <a href="https://www.linkedin.com/company/simproof/" target="_blank" rel="noopener">LinkedIn</a>.</p>
         </div>
 
         <form class="contact-form" id="contact-form" novalidate>
@@ -747,6 +764,6 @@
     </div>
   </footer>
 
-  <script src="./app.js?v=3"></script>
+  <script src="./app.js?v=4"></script>
 </body>
 </html>

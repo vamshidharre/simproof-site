@@ -1024,9 +1024,286 @@ dd code,
 }
 
 .terminal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  padding-right: 12px;
+  overflow-x: auto;
+}
+
+.tab-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pass);
+  margin-right: 7px;
+  vertical-align: 0.05em;
+  box-shadow: 0 0 0 2px var(--pass-wash);
+}
+
+.terminal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stream-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--graphite);
+  font: 500 0.75rem var(--font-code);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.stream-btn:hover {
+  background: var(--tint);
+  color: var(--ink);
+  border-color: var(--rule-strong);
+}
+
+/* ---------- llm-ui Streaming Chat Interface ---------- */
+
+.llm-ui-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 380px;
+  max-height: 480px;
+  background: var(--code-bg);
+}
+
+.llm-presets-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
   background: var(--surface);
   border-bottom: 1px solid var(--rule);
   overflow-x: auto;
+}
+
+.llm-presets-label {
+  font: 600 0.72rem var(--font-code);
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.preset-pill {
+  padding: 4px 11px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--tint);
+  color: var(--graphite);
+  font: 500 0.75rem var(--font-body);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.preset-pill:hover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--rule-strong);
+}
+
+.preset-pill.is-active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+
+.llm-chat-stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.llm-msg-user {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 9px 13px;
+  color: var(--ink);
+}
+
+.llm-user-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--tint);
+  font: 600 0.7rem var(--font-code);
+  color: var(--graphite);
+  text-transform: uppercase;
+}
+
+.llm-user-prompt {
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+
+.llm-msg-assistant {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Tool execution block (llm-ui custom component) */
+.llm-tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--proof);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+}
+
+.llm-tool-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--graphite);
+  font-weight: 500;
+}
+
+.llm-tool-head .tool-name {
+  color: var(--proof);
+  font-weight: 600;
+}
+
+.llm-tool-result {
+  color: var(--pass);
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.llm-tool-result.running {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.llm-tool-result.has-fail {
+  color: var(--fail);
+}
+
+.llm-tool-result.has-warn {
+  color: var(--warn);
+}
+
+/* Streamed text content */
+.llm-response-content {
+  color: var(--code-ink);
+  line-height: 1.65;
+  font-size: 0.8125rem;
+}
+
+.llm-response-content p {
+  margin: 0 0 10px 0;
+}
+
+.llm-response-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Custom embedded finding card */
+.llm-finding-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.llm-finding-card.fail {
+  border-color: var(--fail);
+  background: #fffafa;
+}
+
+.llm-finding-card.pass {
+  border-color: var(--pass);
+  background: #f7faf8;
+}
+
+.llm-finding-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.llm-finding-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  color: var(--graphite);
+}
+
+.llm-finding-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Blinking cursor */
+.llm-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 1.1em;
+  vertical-align: -0.15em;
+  background: var(--proof);
+  margin-left: 2px;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (max-width: 640px) {
+  .terminal-head {
+    flex-direction: column;
+    align-items: stretch;
+    padding-right: 0;
+  }
+  .terminal-actions {
+    padding: 6px 12px;
+    border-top: 1px solid var(--rule);
+    justify-content: flex-end;
+  }
 }
 
 .terminal-tabs {
