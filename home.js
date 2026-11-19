@@ -1,9 +1,12 @@
-// SimProof home page motion: a particle field that changes shape with each chapter,
-// word-by-word headlines, a chapter rail, a reading progress bar and counting numbers.
+// SimProof home page motion.
+// A particle field that changes shape with each chapter and reacts to the cursor,
+// eased scroll, magnetic buttons, a custom cursor, tilting cards, word-by-word
+// headlines, a chapter rail, a reading progress bar and counting numbers.
 (function () {
   "use strict";
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = window.matchMedia("(pointer: fine)").matches && !("ontouchstart" in window);
 
   // ---------- Headlines: wrap each word so it can slide in ----------
   let wordIndex = 0;
@@ -71,13 +74,54 @@
     counted.observe(numbers);
   }
 
+  // ---------- Eased scroll ----------
+  // Wheel ticks are accumulated into a target and the page glides toward it, the
+  // way Lenis-style sites do. Keyboard, the scrollbar and touch scroll the page
+  // natively; whenever that happens the target re-syncs so nothing fights.
+  const docEl = document.documentElement;
+  let scrollTarget = window.scrollY;
+  let lastSetY = window.scrollY; // the value WE last pushed via scrollTo
+  const maxScroll = () => Math.max(0, docEl.scrollHeight - window.innerHeight);
+
+  if (finePointer && !reduceMotion) {
+    window.addEventListener("wheel", (e) => {
+      if (e.ctrlKey) return; // let pinch-zoom through untouched
+      e.preventDefault();
+      scrollTarget = Math.min(maxScroll(), Math.max(0, scrollTarget + e.deltaY));
+    }, { passive: false });
+  }
+
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const id = a.getAttribute("href").slice(1);
+    const target = id ? document.getElementById(id) : null;
+    if (!target) return;
+    e.preventDefault();
+    const headerOffset = 76;
+    const y = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+    scrollTarget = Math.min(maxScroll(), Math.max(0, y));
+    if (!finePointer || reduceMotion) {
+      window.scrollTo({ top: scrollTarget, behavior: reduceMotion ? "auto" : "smooth" });
+    }
+    history.replaceState(null, "", "#" + id);
+  });
+
+  window.addEventListener("scroll", () => {
+    // scrollTo() dispatches its own 'scroll' event on a later frame, after this
+    // function's caller has already moved on, so a same-tick flag can't tell
+    // our own scroll apart from the user's. Comparing against the last value we
+    // set can: anything else (keyboard, scrollbar, touch) means they took over.
+    if (Math.abs(window.scrollY - lastSetY) > 1.5) scrollTarget = window.scrollY;
+  }, { passive: true });
+
   // ---------- Progress bar, rail and the active chapter ----------
   const bar = document.getElementById("progress-bar");
   const railLinks = Array.from(document.querySelectorAll("[data-rail]"));
   let activeShape = "drift";
 
-  function onScroll() {
-    const max = document.documentElement.scrollHeight - window.innerHeight;
+  function updateChrome() {
+    const max = maxScroll();
     if (bar) bar.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + "%";
 
     const mid = window.innerHeight * 0.5;
@@ -93,9 +137,72 @@
       railLinks.forEach((a) => a.classList.toggle("on", a.dataset.rail === best.id));
     }
   }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
-  onScroll();
+  window.addEventListener("scroll", updateChrome, { passive: true });
+  window.addEventListener("resize", updateChrome);
+  updateChrome();
+
+  // ---------- Magnetic buttons ----------
+  if (finePointer && !reduceMotion) {
+    document.querySelectorAll(".btn, .rail a").forEach((el) => {
+      let raf = null;
+      el.addEventListener("mousemove", (e) => {
+        const r = el.getBoundingClientRect();
+        const mx = e.clientX - (r.left + r.width / 2);
+        const my = e.clientY - (r.top + r.height / 2);
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          el.style.transform = `translate(${mx * 0.28}px, ${my * 0.32}px)`;
+        });
+      });
+      el.addEventListener("mouseleave", () => {
+        if (raf) cancelAnimationFrame(raf);
+        el.style.transform = "";
+      });
+    });
+  }
+
+  // ---------- Custom cursor ----------
+  let mouseX = -999, mouseY = -999;
+  if (finePointer) {
+    document.body.classList.add("has-cursor");
+    const cursor = document.createElement("div");
+    cursor.className = "cursor-dot";
+    cursor.setAttribute("aria-hidden", "true");
+    document.body.appendChild(cursor);
+    let cx = -999, cy = -999;
+
+    window.addEventListener("mousemove", (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      const over = e.target.closest("a, button, .btn, input, select, textarea, .example, .card");
+      cursor.classList.toggle("is-big", Boolean(over));
+    }, { passive: true });
+
+    window.addEventListener("mouseleave", () => { mouseX = mouseY = -999; });
+
+    function cursorFrame() {
+      const ease = reduceMotion ? 1 : 0.22;
+      cx += (mouseX - cx) * ease;
+      cy += (mouseY - cy) * ease;
+      cursor.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
+      requestAnimationFrame(cursorFrame);
+    }
+    requestAnimationFrame(cursorFrame);
+  }
+
+  // ---------- Card tilt ----------
+  if (finePointer && !reduceMotion) {
+    document.querySelectorAll(".card, .example").forEach((el) => {
+      el.classList.add("tilt");
+      el.addEventListener("mousemove", (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = `perspective(900px) rotateX(${(-py * 5).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg)`;
+      });
+      el.addEventListener("mouseleave", () => { el.style.transform = ""; });
+    });
+  }
 
   // ---------- The particle field ----------
   const canvas = document.getElementById("field");
@@ -234,11 +341,25 @@
     };
   }
 
+  const REPEL_R = 130;
+  const REPEL_R2 = REPEL_R * REPEL_R;
+
   let last = performance.now();
   function frame(now) {
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
     const time = now / 1000;
+
+    // Eased scroll: glide window.scrollY toward scrollTarget.
+    const diff = scrollTarget - window.scrollY;
+    if (finePointer && !reduceMotion && Math.abs(diff) > 0.5) {
+      lastSetY = window.scrollY + diff * Math.min(1, dt * 9);
+      // behavior: "instant" bypasses the page's CSS scroll-behavior: smooth.
+      // Without it, the browser's own ~300ms eased scroll fights this loop's
+      // easing on every frame and the page stalls partway to its target.
+      window.scrollTo({ top: lastSetY, left: 0, behavior: "instant" });
+    }
+
     ctx.clearRect(0, 0, W, H);
 
     const target = shapes[activeShape] || shapes.drift;
@@ -260,6 +381,8 @@
       ctx.stroke();
     }
 
+    const repel = finePointer && !reduceMotion && mouseY > -500;
+
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
       const t = target[i];
@@ -278,6 +401,18 @@
       for (let j = 0; j < 3; j++) p.c[j] += (t.c[j] - p.c[j]) * ease;
       p.a += (t.a - p.a) * ease;
 
+      // The field leans away from the cursor, like iron filings near a magnet.
+      if (repel) {
+        const ddx = p.x - mouseX, ddy = p.y - mouseY;
+        const d2 = ddx * ddx + ddy * ddy;
+        if (d2 < REPEL_R2 && d2 > 0.01) {
+          const d = Math.sqrt(d2);
+          const push = (1 - d / REPEL_R) * 34;
+          p.x += (ddx / d) * push;
+          p.y += (ddy / d) * push;
+        }
+      }
+
       let r = p.r;
       if (t.bad && !reduceMotion) r *= 1.4 + Math.sin(time * 4 + p.ph) * 0.4;
       ctx.fillStyle = `rgba(${p.c[0] | 0}, ${p.c[1] | 0}, ${p.c[2] | 0}, ${p.a.toFixed(3)})`;
@@ -286,11 +421,15 @@
       ctx.fill();
     }
 
-    if (!reduceMotion) requestAnimationFrame(frame);
+    if (!reduceMotion || Math.abs(diff) > 0.5) requestAnimationFrame(frame);
   }
 
   build();
-  window.addEventListener("resize", () => { build(); if (reduceMotion) requestAnimationFrame(frame); });
+  window.addEventListener("resize", () => {
+    build();
+    scrollTarget = window.scrollY;
+    if (reduceMotion) requestAnimationFrame(frame);
+  });
   if (reduceMotion) {
     window.addEventListener("scroll", () => requestAnimationFrame(frame), { passive: true });
   }
