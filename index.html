@@ -307,11 +307,15 @@
       <div class="wrap contact">
         <div>
           <h2 class="reveal">Ask for a free check.</h2>
-          <p class="lead">Sending opens your email app with the request filled in. Nothing is stored on this site.</p>
+          <p class="lead">Tell us about your model or workflow. We will review your study and respond directly.</p>
           <p class="muted">Or reach us on <a href="https://www.linkedin.com/company/simproof/" target="_blank" rel="noopener">LinkedIn</a>.</p>
         </div>
 
-        <form class="form card" id="contact-form" novalidate>
+        <form class="form card" id="contact-form" name="study-request" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <input type="hidden" name="form-name" value="study-request">
+          <p style="display:none" aria-hidden="true">
+            <label>Don’t fill this out if you're human: <input name="bot-field"></label>
+          </p>
           <div class="field">
             <label for="f-email">Work email</label>
             <input type="email" id="f-email" name="email" autocomplete="email" required placeholder="name@company.com">
@@ -346,7 +350,7 @@
             <label for="f-message">What do you need? <span class="muted">(optional)</span></label>
             <textarea id="f-message" name="message" rows="3" placeholder="Solver, analysis type, deadline"></textarea>
           </div>
-          <button type="submit" class="btn btn-dark">Send request by email</button>
+          <button type="submit" class="btn btn-dark">Send request</button>
           <p class="form-status" id="form-status" role="status"></p>
         </form>
       </div>

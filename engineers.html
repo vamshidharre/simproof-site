@@ -14,27 +14,27 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=6">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=7">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <header class="masthead">
-    <div class="wrap masthead-row">
-      <a href="./" class="wordmark" aria-label="SimProof home">
-        <img src="./favicon.svg" alt="" width="28" height="28">
+  <header class="top">
+    <div class="wrap top-row">
+      <a href="./" class="brand" aria-label="SimProof home">
+        <img src="./favicon.svg" alt="" width="30" height="30">
         <span>SimProof</span>
       </a>
-      <nav class="primary-nav" aria-label="Main">
+      <nav class="nav" aria-label="Main">
         <a href="./">Home</a>
-        <a href="#what">For engineers</a>
+        <a href="#what">Overview</a>
         <a href="#demo">Demo</a>
-        <a href="#available">Checks</a>
-        <a href="#pilot">Free check</a>
-        <a href="#about">About</a>
+        <a href="#assistant">Assistant</a>
+        <a href="#available">32 Checks</a>
+        <a href="./engineers.html" class="nav-active" style="color: var(--proof, #1f4fd1); font-weight: 600;">For engineers</a>
       </nav>
-      <a href="#pilot" class="button button-primary button-small">Get a free check</a>
+      <a href="#contact" class="btn btn-dark btn-small" data-interest="A free check of one of my studies">Get a free check</a>
     </div>
   </header>
 
@@ -364,11 +364,15 @@
           <p>
             Ask for a free check of one of your studies, or tell us what you would need SimProof to do.
           </p>
-          <p>Sending opens your email app with the request filled in; nothing is stored on this site.</p>
+          <p>We review your study and follow up directly with your verification report.</p>
           <p class="contact-direct">Or reach out directly on <a href="https://www.linkedin.com/company/simproof/" target="_blank" rel="noopener">LinkedIn</a>.</p>
         </div>
 
-        <form class="contact-form" id="contact-form" novalidate>
+        <form class="contact-form" id="contact-form" name="study-request" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <input type="hidden" name="form-name" value="study-request">
+          <p style="display:none" aria-hidden="true">
+            <label>Don’t fill this out if you're human: <input name="bot-field"></label>
+          </p>
           <div class="field">
             <label for="f-email">Work email</label>
             <input type="email" id="f-email" name="email" autocomplete="email" required placeholder="name@company.com">
@@ -406,18 +410,19 @@
             <label for="f-message">What do you need? <span class="optional">(optional)</span></label>
             <textarea id="f-message" name="message" rows="4" placeholder="Solver, analysis type, features, deadline"></textarea>
           </div>
-          <button type="submit" class="button button-primary">Send request by email</button>
+          <button type="submit" class="button button-primary">Send request</button>
           <p class="form-status" id="form-status" role="status"></p>
         </form>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap footer-row">
-      <span class="wordmark wordmark-static"><img src="./favicon.svg" alt="" width="22" height="22"><span>SimProof</span></span>
-      <p class="footer-line">No engineering decision should rest on a simulation number that nobody can prove.</p>
-      <nav class="footer-links" aria-label="Contact">
+  <footer class="foot">
+    <div class="wrap foot-row">
+      <span class="brand brand-small"><img src="./favicon.svg" alt="" width="22" height="22"><span>SimProof</span></span>
+      <p>No engineering decision should rest on a simulation number that nobody can prove.</p>
+      <nav aria-label="Footer">
+        <a href="./">Home</a>
         <a href="mailto:vamshidharreddye@gmail.com">Email</a>
         <a href="https://www.linkedin.com/company/simproof/" target="_blank" rel="noopener">LinkedIn</a>
       </nav>

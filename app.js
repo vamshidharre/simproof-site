@@ -410,7 +410,7 @@ function initContactForm() {
     }
   });
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!email.value.trim() || !email.validity.valid) {
       email.setAttribute("aria-invalid", "true");
@@ -423,19 +423,40 @@ function initContactForm() {
       return;
     }
 
-    const data = new FormData(form);
-    const subject = `SimProof: ${data.get("interest")}`;
-    const body = [
-      `Email: ${data.get("email")}`,
-      `Company: ${data.get("company") || "-"}`,
-      `Main solver: ${data.get("solver")}`,
-      `Interested in: ${data.get("interest")}`,
-      "",
-      data.get("message") || "",
-    ].join("\n");
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : "Send request";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+    }
+    status.className = "form-status";
+    status.textContent = "Sending your request...";
 
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    status.textContent = `Your email app should now be open with the request filled in. If nothing opened, reach out to us on LinkedIn.`;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData).toString(),
+      });
+
+      if (response.ok) {
+        status.className = "form-status is-success";
+        status.textContent = "Thank you! Your request has been received. We will get back to you shortly.";
+        form.reset();
+      } else {
+        throw new Error(`Server returned ${response.status}`);
+      }
+    } catch (err) {
+      status.className = "form-status is-error";
+      status.textContent = `Could not submit request. Please reach out directly at ${CONTACT_EMAIL} or on LinkedIn.`;
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+    }
   });
 }
 

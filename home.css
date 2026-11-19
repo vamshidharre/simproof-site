@@ -80,29 +80,29 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Custom cursor: a small ring that grows over anything clickable. Fine pointers only. */
+/* Custom cursor follower: an ambient accent ring that reacts over clickable elements.
+   The native OS pointer remains 100% visible, crisp, and responsive. */
 .cursor-dot {
   position: fixed;
-  top: -14px;
-  left: -14px;
-  width: 28px;
-  height: 28px;
+  top: -15px;
+  left: -15px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  border: 1.5px solid rgba(18, 21, 28, 0.55);
+  border: 1.5px solid rgba(42, 91, 246, 0.45);
+  background: rgba(42, 91, 246, 0.05);
   z-index: 999;
   pointer-events: none;
-  mix-blend-mode: difference;
-  transition: width 0.25s cubic-bezier(.2,.8,.2,1), height 0.25s cubic-bezier(.2,.8,.2,1), border-color 0.25s ease, background 0.25s ease;
+  transition: width 0.22s cubic-bezier(.2,.8,.2,1), height 0.22s cubic-bezier(.2,.8,.2,1), border-color 0.2s ease, background 0.2s ease;
 }
 .cursor-dot.is-big {
-  width: 54px;
-  height: 54px;
-  top: -27px;
-  left: -27px;
-  background: rgba(255, 255, 255, 0.9);
-  border-color: transparent;
+  width: 48px;
+  height: 48px;
+  top: -24px;
+  left: -24px;
+  border-color: rgba(42, 91, 246, 0.75);
+  background: rgba(42, 91, 246, 0.09);
 }
-.has-cursor, .has-cursor a, .has-cursor button, .has-cursor .btn { cursor: none; }
 @media (max-width: 1100px) { .cursor-dot { display: none; } }
 
 .progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 200; }
@@ -465,6 +465,8 @@ h1 em, h2 em, .js h1 em .w, .js h2 em .w {
 .form .btn { justify-self: start; }
 .form-status { color: var(--soft); font-size: 0.9rem; }
 .form-status:empty { display: none; }
+.form-status.is-success { color: var(--pass); font-weight: 500; }
+.form-status.is-error { color: var(--fail); font-weight: 500; }
 
 /* Footer */
 .foot { padding: 40px 0 50px; border-top: 1px solid var(--line); background: rgba(247, 248, 251, 0.8); }
