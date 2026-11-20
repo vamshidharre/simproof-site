@@ -4,13 +4,13 @@
 :root {
   --paper: #ffffff;
   --surface: #ffffff;
-  --tint: #f6f7f8;
-  --ink: #18191b;
-  --graphite: #5d636b;
-  --muted: #8a9098;
+  --tint: #f5f8fc;
+  --ink: #172d45;
+  --graphite: #52677c;
+  --muted: #617185;
   --rule: #e6e8eb;
   --rule-strong: #cfd3d8;
-  --proof: #1f4fd1;
+  --proof: #245bca;
   --proof-wash: #eef2fd;
   --proof-line: #c3d1f6;
   --fail: #c0322b;
@@ -23,8 +23,8 @@
   --code-ink: #2b2f34;
   --code-dim: #8a9098;
 
-  --font-head: "Montserrat", "Segoe UI", sans-serif;
-  --font-body: "DM Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --font-head: "Manrope", "Segoe UI", sans-serif;
+  --font-body: "Manrope", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
   --font-code: "IBM Plex Mono", Consolas, "Courier New", monospace;
 
   --wrap: 1140px;
@@ -1726,3 +1726,9 @@ dd code,
     grid-template-columns: 1fr;
   }
 }
+
+/* Align technical pages with the main SimProof identity. */
+.button-primary, .btn-dark { background: var(--proof); border-color: var(--proof); }
+.button-primary:hover, .btn-dark:hover { background: #1748aa; border-color: #1748aa; }
+.top { background: #fffffff5; }
+h1,h2,h3 { text-wrap: balance; }

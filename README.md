@@ -1,49 +1,33 @@
 # SimProof website
 
-Static landing page for SimProof. It is self-contained in this folder and does not touch the
-Python package (`src/`, `tests/`).
+Static SimProof marketing site hosted at https://simproof.netlify.app/.
 
 ## Files
 
-- `index.html`: the page. Sections: hero, the problem, how it works, the traced-report demo,
-  MCP and command line, the checks that work today, the free check for early users, about,
-  contact.
-- `styles.css`: design tokens on `:root`. Light only and flat: hairline borders, no shadows.
-  Type is IBM Plex Sans with IBM Plex Mono for code, loaded from Google Fonts.
-- `app.js`: the hero animation, the clickable `[E#]` evidence demo, the terminal tabs, and the
-  contact form.
-- `favicon.svg`: the logo, an evidence bracket around a check mark.
+- `index.html`, `home.css`, `home.js`: plain-language homepage, synthetic evidence example, workflow, FAQ and free-pilot form.
+- `engineers.html`, `styles.css`: detailed checks, reader scope and interactive technical report. Shares the homepage's typeface and core colours.
+- `app.js`: existing evidence demo, terminal and Netlify form handler used by both pages.
+- `favicon.svg`: existing evidence-bracket logo.
+- `docs/website-research-2026-11-20.md`: product research, evaluated skills, source links, design decisions and validation limits.
 
-## Every number on the page has a source
+## Content evidence
 
-The hero chart, the demo and the terminal output are real SimProof 0.1.0 output for the
-synthetic test model `tests/fixtures/pulsed_static` (no client data). If checks, wording or
-evidence formatting change, regenerate and update `EVIDENCE`, `FINDINGS`, `DECK_LINES` and
-`TERMINAL` in `app.js`:
+Numeric examples come from the existing synthetic fixtures described in `app.js`. Do not add customer data, invented statistics or unverified solver capabilities. Ansys is the main workflow; other listed readers are early support. A passing check does not certify a design.
 
-```bash
-PYTHONPATH=src python -m simproof.cli check tests/fixtures/pulsed_static
-PYTHONPATH=src python -m simproof.cli report tests/fixtures/pulsed_static -o report.md
+## Local preview
+
+From this directory:
+
+```powershell
+python -m http.server 8080 --bind 127.0.0.1
 ```
 
-Do not add statistics, savings figures or capability claims that SimProof cannot back up.
-Readers and checks listed on the page must match `src/simproof/readers` and `src/simproof/checks`.
+Open http://127.0.0.1:8080/. There are no package dependencies or build step. Google Fonts are optional external requests with local font fallbacks.
 
 ## Contact form
 
-The site has no backend. Submitting the form opens the visitor's email app with the request
-filled in (a `mailto:` link to the address in `CONTACT_EMAIL` in `app.js`). Nothing is stored.
-To collect submissions instead, point the form at a form service (for example Netlify Forms)
-and remove the `mailto:` handler.
+Both pages retain `study-request`, its Netlify form declaration, hidden form-name, honeypot and existing field names. `app.js` validates email, then posts URL-encoded form data to `/`. It displays progress, success or failure feedback. A local Python static server does not accept POST requests, so it can verify the error path only. Production Netlify receipt and notification delivery require a separate authorised end-to-end check. Do not send a real request during routine preview testing.
 
-## Preview locally
+## Publication
 
-```bash
-python -m http.server 8080 --directory website
-```
-
-Then open http://localhost:8080.
-
-## Deploy
-
-The site is fully static. Publish the `website` folder on Netlify, Vercel or GitHub Pages.
+The public site deploys from main. Ask the founder before pushing or publishing. Do not mix this repo with the private SimProof engine, real study files or CASE-A data.
