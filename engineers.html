@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=8">
+  <link rel="stylesheet" href="./styles.css?v=10">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -31,7 +31,7 @@
         <a href="#what">Overview</a>
         <a href="#demo">Demo</a>
         <a href="#assistant">Assistant</a>
-        <a href="#available">32 Checks</a>
+        <a href="#available">Checks</a>
       </nav>
       <a href="#contact" class="btn btn-dark btn-small" data-interest="A free check of one of my studies">Get a free check</a>
     </div>
@@ -44,10 +44,11 @@
       <div class="wrap">
         <div class="section-head">
           <p class="eyebrow">SimProof for engineers</p>
-          <h2>Before the solve and after it</h2>
+          <h1>Before the solve and after it</h1>
           <p>
-            32 deterministic checks run on the raw solver files, with no AI deciding anything. A pass means no
-            setup or balance error was found; it does not approve the design.
+            SimProof applies deterministic checks relevant to your study, with no AI deciding the findings.
+            Each result explains what was checked or why a check was skipped. A pass applies to that check;
+            it does not approve the design.
           </p>
         </div>
 
@@ -247,7 +248,7 @@
         </dl>
 
         <details class="check-details">
-        <summary>Show all 32 checks</summary>
+        <summary>Explore checks by category</summary>
         <div class="check-groups">
           <div class="check-group">
             <h3>Model setup</h3>
@@ -349,7 +350,7 @@
             Follow our company page on LinkedIn for product updates, engineering case studies, and announcements:
           </p>
           <p class="about-links">
-            <a href="https://www.linkedin.com/company/simproof/" target="_blank" rel="noopener">SimProof on LinkedIn &rarr;</a>
+            <a href="https://www.linkedin.com/company/simproof/" target="_blank" rel="noopener">SimProof on LinkedIn</a>
           </p>
         </div>
       </div>
@@ -385,9 +386,9 @@
             <div class="field">
               <label for="f-solver">Main solver</label>
               <select id="f-solver" name="solver">
-                <option>Ansys Mechanical / MAPDL</option>
+                <option value="Ansys Mechanical / MAPDL">Ansys / MAPDL</option>
                 <option>Abaqus</option>
-                <option>Nastran (MSC / Simcenter)</option>
+                <option value="Nastran (MSC / Simcenter)">Nastran</option>
                 <option>Ansys Fluent</option>
                 <option>OpenFOAM</option>
                 <option>LS-DYNA</option>
@@ -398,9 +399,9 @@
             <div class="field">
               <label for="f-interest">Interested in</label>
               <select id="f-interest" name="interest">
-                <option>A free check of one of my studies</option>
-                <option>Early access to SimProof</option>
-                <option>Claude Code / MCP integration</option>
+                <option value="A free check of one of my studies">Free check of one study</option>
+                <option value="Early access to SimProof">Early access</option>
+                <option value="Claude Code / MCP integration">Claude Code / MCP</option>
                 <option>Something else</option>
               </select>
             </div>
@@ -425,10 +426,10 @@
         <a href="mailto:vamshidharreddye@gmail.com">Email</a>
         <a href="https://www.linkedin.com/company/simproof/" target="_blank" rel="noopener">LinkedIn</a>
       </nav>
-      <p class="footer-small">&copy; 2026 SimProof &middot; Erlangen, Germany</p>
+      <p class="footer-small">Erlangen, Germany</p>
     </div>
   </footer>
 
-  <script src="./app.js?v=4"></script>
+  <script src="./app.js?v=6"></script>
 </body>
 </html>

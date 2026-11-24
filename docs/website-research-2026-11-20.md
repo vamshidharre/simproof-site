@@ -85,3 +85,11 @@ Publication requires founder approval because pushing this repository's main bra
 | Help and documentation | Contextual FAQ and working technical links | No major finding | Local destinations checked |
 
 Final manual checks: 1280px desktop, 390px and 320px mobile without horizontal overflow; technical page checked on mobile; no browser console errors reported on the final homepage. Syntax checks and git diff whitespace check passed. The preview server is stopped after QA; start it using README instructions to revisit the site.
+
+## Motion revision requested by founder
+
+The founder requested a more animated experience after reviewing the published redesign. The local revision adds a dark engineering viewport, a deforming illustrative mesh, a moving node field behind the hero, an inspection sweep and small evidence-flow highlights. Motion references were browsed at https://60fps.design/; the implementation and geometry are original and use no third-party animation library.
+
+A labelled native range control adjusts illustrative deformation and works by keyboard. A pause/play button freezes automatic motion, including CSS flow accents. The animation starts paused for reduced-motion preferences, tracks preference changes, and suspends its requestAnimationFrame loop while the hero is offscreen or the document hidden. Canvas resolution is capped at device pixel ratio 2 and animation drawing targets about 30fps. Pointer movement adjusts the viewing angle without intercepting scrolling or touch navigation. The static SVG remains the fallback if scripts or canvas are unavailable.
+
+Verification: JavaScript syntax and whitespace checks; desktop and 390px screenshots; no horizontal overflow; ArrowRight changed slider and output from 60% to 61%; screenshots differed during playback and were identical across separate captures while paused. Reduced-motion handling was reviewed in code, not tested by changing the operating-system setting. Existing form handler unchanged. This revision has not been published.

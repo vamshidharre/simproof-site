@@ -6,6 +6,7 @@ Static SimProof marketing site hosted at https://simproof.netlify.app/.
 
 - `index.html`, `home.css`, `home.js`: plain-language homepage, synthetic evidence example, workflow, FAQ and free-pilot form.
 - `engineers.html`, `styles.css`: detailed checks, reader scope and interactive technical report. Shares the homepage's typeface and core colours.
+- `motion.js`: animated hero mesh and background, illustrative load slider, pause/play and reduced-motion handling. No solver or external animation dependency.
 - `app.js`: existing evidence demo, terminal and Netlify form handler used by both pages.
 - `favicon.svg`: existing evidence-bracket logo.
 - `docs/website-research-2026-11-20.md`: product research, evaluated skills, source links, design decisions and validation limits.

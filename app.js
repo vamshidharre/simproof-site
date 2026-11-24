@@ -241,7 +241,7 @@ function showEvidence(id, { scrollDeck = true } = {}) {
     <dt>Unit</dt><dd class="mono">${escapeHtml(ev.unit)}</dd>
     <dt>Source file</dt><dd class="mono">${ev.file || DECK_FILE}</dd>
     <dt>Location</dt><dd class="mono">${escapeHtml(ev.location)}</dd>
-    <dt>SHA-256</dt><dd class="mono">${ev.sha || DECK_SHA}</dd>`;
+    <dt>SHA-256 prefix</dt><dd class="mono">${ev.sha || DECK_SHA}</dd>`;
 
   document.getElementById("ev-verify").innerHTML =
     `The report quotes <strong>${escapeHtml(ev.quoted)}</strong>. Rounded to the same precision, the evidence value ` +
@@ -257,7 +257,7 @@ function showEvidence(id, { scrollDeck = true } = {}) {
   });
 
   if (cited && scrollDeck) {
-    deck.scrollTo({ top: cited.offsetTop - deck.offsetTop - 12, behavior: "smooth" });
+    deck.scrollTo({ top: cited.offsetTop - deck.offsetTop - 12, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   } else if (cited) {
     deck.scrollTop = cited.offsetTop - deck.offsetTop - 12;
   }

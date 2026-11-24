@@ -29,7 +29,7 @@
 
   --wrap: 1140px;
   --gutter: 24px;
-  --radius: 14px;
+  --radius: 12px;
   --section-space: 96px;
 }
 
@@ -150,7 +150,7 @@ dd code,
   font: 600 0.9375rem/1 var(--font-body);
   text-decoration: none;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s cubic-bezier(0.22,1,0.36,1), background 0.2s cubic-bezier(0.22,1,0.36,1);
 }
 
 .button:hover, .btn:hover {
@@ -211,7 +211,7 @@ dd code,
   font: 500 0.78em/1.45 var(--font-code);
   vertical-align: 0.08em;
   cursor: pointer;
-  transition: background-color 0.12s ease;
+  transition: background-color 0.2s cubic-bezier(0.22,1,0.36,1);
 }
 
 .tag:hover {
@@ -286,7 +286,7 @@ dd code,
   color: var(--graphite);
   font: 500 0.9375rem/1 var(--font-body);
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color 0.2s cubic-bezier(0.22,1,0.36,1);
 }
 
 .nav a:hover,
@@ -451,7 +451,7 @@ dd code,
   align-items: start;
   margin-top: 16px;
   font-size: 0.9375rem;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s cubic-bezier(0.22,1,0.36,1);
 }
 
 .scope-verdict .chip {
@@ -493,6 +493,7 @@ dd code,
   margin-bottom: 44px;
 }
 
+.section-head h1,
 .section-head h2,
 .assistant-copy h2,
 .about-grid h2 {
@@ -740,7 +741,7 @@ dd code,
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s cubic-bezier(0.22,1,0.36,1);
 }
 
 .audit-card:hover {
@@ -1401,7 +1402,7 @@ dd code,
 .footer-links a {
   color: var(--graphite);
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color 0.2s cubic-bezier(0.22,1,0.36,1);
 }
 
 .foot nav a:hover,
@@ -1732,3 +1733,6 @@ dd code,
 .button-primary:hover, .btn-dark:hover { background: #1748aa; border-color: #1748aa; }
 .top { background: #fffffff5; }
 h1,h2,h3 { text-wrap: balance; }
+
+/* Native select values need the full form width on narrow panels. */
+.field-row{grid-template-columns:1fr;gap:0}
